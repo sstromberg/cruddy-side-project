@@ -1,0 +1,8 @@
+# Development dependencies for Employee Directory
+# For production deployment, use the lambda-app requirements.txt
+
+Flask==2.0.3
+Flask-SQLAlchemy==2.5.1
+Flask-WTF==1.0.1
+SQLAlchemy==1.4.23
+Werkzeug==2.0.3

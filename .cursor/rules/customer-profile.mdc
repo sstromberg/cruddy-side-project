@@ -1,0 +1,11 @@
+---
+description: description of customer
+alwaysApply: false
+---
+
+- the customer is a hobbyist
+- comments, documentation, and names should be verbose
+- however, value consiseness and avoid repetitive or filler language
+- assume very small scale when in production
+- prefer solutions that minimize cloud costs
+- prefer solutions that minimize architecture complexity

@@ -1,0 +1,70 @@
+{% extends "main.html" %}
+{% block headtitle %}Corporate Directory - Home{% endblock %}
+{% block headnav %}
+<a class="btn btn-outline-primary" href="{{ url_for('add') }}">Add</a>
+{% endblock %}
+{% block body %}
+    {% if not employees %}
+        <div class="text-center py-4">
+            <h4 class="text-muted">Empty Directory</h4>
+            <p class="text-muted">No employees found. Click "Add" to create the first employee.</p>
+        </div>
+    {% else %}
+        <div class="table-responsive">
+            <table class="table table-hover">
+                <thead class="table-light">
+                    <tr>
+                        <th scope="col">Employee</th>
+                        <th scope="col">Job Title</th>
+                        <th scope="col" class="text-end">Actions</th>
+                    </tr>
+                </thead>
+                <tbody>
+                {% for employee in employees %}
+                    <tr>
+                        <td data-label="Employee">
+                            <div class="d-flex flex-column">
+                                <a href="{{ url_for('view', employee_id=employee.id) }}" class="fw-bold text-decoration-none">
+                                    {{employee.fullname}}
+                                </a>
+                                <small class="text-muted">{{employee.location}}</small>
+                                <div class="mt-1">
+                                    {% for badge in badges %}
+                                    {% if badge in employee['badges'] %}
+                                    <span class="badge bg-primary me-1 mb-1">
+                                        <i class="fa fa-{{badge}}" title="{{badges[badge]}}"></i>
+                                        <span class="d-none d-sm-inline">{{badges[badge]}}</span>
+                                    </span>
+                                    {% endif %}
+                                    {% endfor %}
+                                </div>
+                            </div>
+                        </td>
+                        <td data-label="Job Title">
+                            <span class="text-body-secondary">{{employee.job_title}}</span>
+                        </td>
+                        <td data-label="Actions" class="text-end">
+                            <div class="btn-group-vertical btn-group-sm d-md-none" role="group">
+                                <a class="btn btn-outline-primary" href="{{ url_for('view', employee_id=employee.id) }}">
+                                    <i class="fa fa-eye"></i> View
+                                </a>
+                                <a class="btn btn-outline-secondary" href="{{ url_for('edit', employee_id=employee.id) }}">
+                                    <i class="fa fa-edit"></i> Edit
+                                </a>
+                            </div>
+                            <div class="btn-group btn-group-sm d-none d-md-flex" role="group">
+                                <a class="btn btn-outline-primary" href="{{ url_for('view', employee_id=employee.id) }}">
+                                    <i class="fa fa-eye"></i> View
+                                </a>
+                                <a class="btn btn-outline-secondary" href="{{ url_for('edit', employee_id=employee.id) }}">
+                                    <i class="fa fa-edit"></i> Edit
+                                </a>
+                            </div>
+                        </td>
+                    </tr>
+                {% endfor %}
+                </tbody>
+            </table>
+        </div>
+    {% endif %}
+{% endblock %}

@@ -1,0 +1,188 @@
+
+<!doctype html>
+<html lang="en">
+  <head>
+    <!-- Required meta tags -->
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">
+
+    <!-- Bootstrap 5 CSS -->
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/css/bootstrap.min.css" rel="stylesheet" integrity="sha384-T3c6CoIi6uLrA9TneNEoa7RxnatzjcDSCmG1MXxSR1GAsXEV/Dwwykc2MPK8M2HN" crossorigin="anonymous">
+    <!-- Font Awesome 6 -->
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.2/css/all.min.css" integrity="sha512-z3gLpd7yknf1YoNbCzqRKc4qyor8gaKU1qmn+CShxbuBusANI9QpRohGBreCFkKxLhei6S9CQXFEbbKuqLg0DA==" crossorigin="anonymous" referrerpolicy="no-referrer" />
+    <!-- Custom CSS -->
+    <link rel="stylesheet" href="{{ url_for('static', filename='css/custom.css') }}">
+    <link rel="icon" 
+          type="image/png" 
+          href="/static/favicon-32x32.png">
+    <title>Corp Directory</title>
+  </head>
+  <body>
+    <!-- Page Loading Overlay -->
+    <div id="pageLoading" class="page-loading">
+      <div class="loading-content">
+        <div class="loading-spinner"></div>
+        <p class="mb-0">Loading...</p>
+      </div>
+    </div>
+
+    <div class="d-flex flex-column flex-md-row align-items-center p-3 px-md-4 mb-3 bg-white border-bottom shadow-sm">
+      <h5 class="my-0 me-md-auto fw-normal">
+        {% block headtitle %}{% endblock %}
+      </h5>
+      <nav class="my-2 my-md-0 me-md-3">
+        {% block headnav %}
+        {% endblock %}
+      </nav>
+      
+    </div>
+    
+
+    <div class="row">
+      <div class="col-md-12">
+        <div class="container-fluid">
+	{% with messages = get_flashed_messages() %}
+            {% if messages %}
+              {% for message in messages %}
+              <div class="alert alert-primary" role="alert">{{ message }}</div>
+              {% endfor %}
+            {% endif %}
+          {% endwith %}
+          <p></p>
+          <div class="card bg-light">
+            <div class="card-body">
+            {% block body %}
+            {% endblock %}
+            </div>
+          </div>
+          <small><b>Frontend &#8594;</b> Hello from {{g.hostname}} {% if message %}<br/><b>Service &#8594;</b> {{message}}{% endif %}</small>
+        </div>
+      </div>
+    </div>
+
+
+    <!-- Bootstrap 5 JavaScript Bundle with Popper -->
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/js/bootstrap.bundle.min.js" integrity="sha384-C6RzsynM9kWDrMNeT87bh95OGNyZPhcTNXj1NW7RuBCsyN/o0jlpcV8Qyq46cDfL" crossorigin="anonymous"></script>
+    <!-- Form Validation Script -->
+    <script src="{{ url_for('static', filename='js/form-validation.js') }}"></script>
+    <script>
+      // Loading state management
+      const LoadingManager = {
+        showPageLoading() {
+          document.getElementById('pageLoading').classList.add('show');
+        },
+        
+        hidePageLoading() {
+          document.getElementById('pageLoading').classList.remove('show');
+        },
+        
+        showButtonLoading(button) {
+          const btnText = button.textContent.trim();
+          button.classList.add('btn-loading');
+          button.disabled = true;
+          button.innerHTML = `
+            <div class="loading-spinner"></div>
+            <span class="btn-text">${btnText}</span>
+          `;
+        },
+        
+        hideButtonLoading(button, originalText) {
+          button.classList.remove('btn-loading');
+          button.disabled = false;
+          button.innerHTML = originalText;
+        },
+        
+        showFormLoading(form) {
+          form.classList.add('form-loading');
+          const spinner = document.createElement('div');
+          spinner.className = 'loading-spinner';
+          spinner.id = 'form-spinner';
+          form.appendChild(spinner);
+        },
+        
+        hideFormLoading(form) {
+          form.classList.remove('form-loading');
+          const spinner = document.getElementById('form-spinner');
+          if (spinner) {
+            spinner.remove();
+          }
+        },
+        
+        showTableLoading(table) {
+          table.classList.add('table-loading');
+          const spinner = document.createElement('div');
+          spinner.className = 'loading-spinner';
+          spinner.id = 'table-spinner';
+          table.appendChild(spinner);
+        },
+        
+        hideTableLoading(table) {
+          table.classList.remove('table-loading');
+          const spinner = document.getElementById('table-spinner');
+          if (spinner) {
+            spinner.remove();
+          }
+        }
+      };
+
+      // Modern JavaScript for badge handling
+      document.addEventListener('DOMContentLoaded', function() {
+        const corpBadges = document.querySelectorAll('.corp-badge');
+        corpBadges.forEach(function(badge) {
+          badge.addEventListener('click', function() {
+            const selectedIds = [];
+            document.querySelectorAll(".corp-badge").forEach(function(item) {
+              if (item.checked) {
+                selectedIds.push(item.id);
+              }
+            });
+            const badgesField = document.getElementById('badges');
+            if (badgesField) {
+              badgesField.value = selectedIds.join(",");
+            }
+          });
+        });
+
+        // Auto-hide page loading after page load
+        setTimeout(() => {
+          LoadingManager.hidePageLoading();
+        }, 500);
+
+        // Add loading states to forms
+        const forms = document.querySelectorAll('form');
+        forms.forEach(form => {
+          form.addEventListener('submit', function(e) {
+            const submitBtn = form.querySelector('button[type="submit"]');
+            if (submitBtn) {
+              const originalText = submitBtn.textContent;
+              LoadingManager.showButtonLoading(submitBtn);
+              
+              // Store original text for restoration
+              submitBtn.dataset.originalText = originalText;
+            }
+          });
+        });
+
+        // Add loading states to delete buttons
+        const deleteButtons = document.querySelectorAll('button[type="submit"]');
+        deleteButtons.forEach(btn => {
+          if (btn.textContent.includes('Delete')) {
+            btn.addEventListener('click', function(e) {
+              const originalText = this.textContent;
+              LoadingManager.showButtonLoading(this);
+              this.dataset.originalText = originalText;
+            });
+          }
+        });
+      });
+
+      // Show page loading on navigation
+      document.addEventListener('click', function(e) {
+        if (e.target.tagName === 'A' && e.target.href && !e.target.href.includes('#')) {
+          LoadingManager.showPageLoading();
+        }
+      });
+    </script>
+
+  </body>
+</html>

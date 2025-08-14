@@ -1,0 +1,16 @@
+{% extends "main.html" %}
+{% block headtitle %}Corporate Directory - Home{% endblock %}
+{% block headnav %}
+<a class="btn btn-outline-primary" href="{{ url_for('add') }}">Add</a>
+{% endblock %}
+{% block body %}
+    <div class="text-center py-4">
+        <div class="alert alert-danger" role="alert">
+            <i class="fa fa-exclamation-triangle me-2"></i>
+            Error loading employees. Please try refreshing the page.
+        </div>
+        <a href="{{ url_for('home') }}" class="btn btn-primary">
+            <i class="fa fa-refresh me-2"></i>Refresh Page
+        </a>
+    </div>
+{% endblock %}

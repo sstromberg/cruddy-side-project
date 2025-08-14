@@ -1,0 +1,34 @@
+service: employee-directory
+frameworkVersion: '3'
+
+plugins:
+  - serverless-offline
+  - serverless-python-requirements
+
+provider:
+  name: aws
+  runtime: python3.9
+  region: us-east-1
+  stage: local
+  environment:
+    DATABASE_URL: ${env:DATABASE_URL, 'postgresql://localhost:5432/employee_directory_dev'}
+    FLASK_SECRET: ${env:FLASK_SECRET, 'dev-secret-key-change-in-production'}
+
+functions:
+  api:
+    handler: handler.lambda_handler
+    events:
+      - httpApi:
+          path: /{proxy+}
+          method: ANY
+    memorySize: 512
+    timeout: 30
+    environment:
+      DATABASE_URL: ${env:DATABASE_URL, 'postgresql://localhost:5432/employee_directory_dev'}
+      FLASK_SECRET: ${env:FLASK_SECRET, 'dev-secret-key-change-in-production'}
+
+custom:
+  serverless-offline:
+    httpPort: 3000
+    lambdaPort: 3002
+    noPrependStageInUrl: true

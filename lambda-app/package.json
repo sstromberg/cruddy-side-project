@@ -1,0 +1,33 @@
+{
+  "name": "employee-directory-lambda",
+  "version": "1.0.0",
+  "description": "Employee Directory Application - Serverless Lambda Version",
+  "main": "handler.py",
+  "scripts": {
+    "deploy": "serverless deploy",
+    "deploy:prod": "serverless deploy --stage prod",
+    "deploy:staging": "serverless deploy --stage staging",
+    "remove": "serverless remove",
+    "logs": "serverless logs -f api",
+    "invoke": "serverless invoke -f api",
+    "invoke:local": "serverless invoke local -f api",
+    "offline": "serverless offline start",
+    "test": "python -m pytest tests/",
+    "lint": "flake8 .",
+    "package": "serverless package"
+  },
+  "keywords": [
+    "serverless",
+    "lambda",
+    "flask",
+    "aurora",
+    "aws"
+  ],
+  "author": "Development Team",
+  "license": "MIT",
+  "devDependencies": {
+    "serverless": "^3.38.0",
+    "serverless-offline": "^13.9.0",
+    "serverless-python-requirements": "^6.0.0"
+  }
+}
