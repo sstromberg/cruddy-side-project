@@ -1,6 +1,6 @@
 #!/usr/bin/env python3.11
 """
-Development server runner for Employee Directory
+Development server runner for Dog Events Tracker
 Run this script to start the application locally for development
 """
 
@@ -14,7 +14,7 @@ sys.path.insert(0, str(app_dir))
 
 # Set development environment variables
 os.environ['FLASK_ENV'] = 'development'
-os.environ['DATABASE_URL'] = 'sqlite:///employees.db'
+os.environ['DATABASE_URL'] = 'sqlite:///dogs.db'
 os.environ['FLASK_SECRET'] = os.urandom(24).hex()
 
 def main():
@@ -22,10 +22,10 @@ def main():
     try:
         from application import application
         
-        print("🚀 Starting Employee Directory Development Server")
+        print("🚀 Starting Dog Events Tracker Development Server")
         print("=" * 50)
         print(f"Environment: {os.environ.get('FLASK_ENV', 'development')}")
-        print(f"Database: {os.environ.get('DATABASE_URL', 'sqlite:///employees.db')}")
+        print(f"Database: {os.environ.get('DATABASE_URL', 'sqlite:///dogs.db')}")
         print(f"URL: http://localhost:8080")
         print("=" * 50)
         print("Press Ctrl+C to stop the server")

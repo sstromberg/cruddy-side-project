@@ -1,87 +1,97 @@
 {% extends "main.html" %}
 {% block headtitle %}{{ title }}{% endblock %}
 {% block headnav %}
-    <a class="btn btn-outline-primary" href="{{ url_for('home') }}">Home</a>
+    <a class="btn btn-outline-secondary" href="{{ url_for('home') }}">
+        <i class="fa fa-arrow-left me-2"></i>Back to Dogs
+    </a>
 {% endblock %}
 {% block body %}
 <div class="row">
-    <div class="col-md-12">
-        <form method="POST" id="employeeForm" data-validation='{"validateOnInput": true, "validateOnBlur": true, "showCharacterCounters": true, "showRealTimeFeedback": true}'>
-            {{ form.hidden_tag() }}
-            
-            <div class="row mb-3">
-                <label class="col-sm-2 col-form-label">{{ form.fullname.label }}</label>
-                <div class="col-sm-10">
-                    {{ form.fullname(class="form-control", placeholder="Enter full name (e.g., John Doe)", maxlength="100") }}
-                    {% if form.fullname.errors %}
-                        {% for error in form.fullname.errors %}
-                            <span class="text-danger">{{ error }}</span>
-                        {% endfor %}
-                    {% endif %}
-                </div>
+    <div class="col-md-8 mx-auto">
+        <div class="card shadow">
+            <div class="card-header">
+                <h3 class="mb-0">
+                    <i class="fa fa-paw me-2"></i>{{ title }}
+                </h3>
             </div>
-            
-            <div class="row mb-3">
-                <label class="col-sm-2 col-form-label">{{ form.location.label }}</label>
-                <div class="col-sm-10">
-                    {{ form.location(class="form-control", placeholder="Enter location (e.g., Seattle, WA)", maxlength="100") }}
-                    {% if form.location.errors %}
-                        {% for error in form.location.errors %}
-                            <span class="text-danger">{{ error }}</span>
-                        {% endfor %}
-                    {% endif %}
-                </div>
-            </div>
-            
-            <div class="row mb-3">
-                <label class="col-sm-2 col-form-label">{{ form.job_title.label }}</label>
-                <div class="col-sm-10">
-                    {{ form.job_title(class="form-control", placeholder="Enter job title (e.g., Software Engineer)", maxlength="100") }}
-                    {% if form.job_title.errors %}
-                        {% for error in form.job_title.errors %}
-                            <span class="text-danger">{{ error }}</span>
-                        {% endfor %}
-                    {% endif %}
-                </div>
-            </div>
-            
-            <div class="row mb-3">
-                <label class="col-sm-2 col-form-label">Badges</label>
-                <div class="col-sm-10">
-                    <div id="badgesContainer">
-                        {% for badge_key, badge_name in badges.items() %}
-                        <div class="form-check form-check-inline">
-                            <input class="form-check-input" type="checkbox" 
-                                   id="badge_{{ badge_key }}" 
-                                   value="{{ badge_key }}"
-                                   {% if badge_key in (form.badges.data or '').split(',') %}checked{% endif %}
-                                   onchange="updateBadges()">
-                            <label class="form-check-label" for="badge_{{ badge_key }}">
-                                <i class="fa fa-{{ badge_key }}"></i> {{ badge_name }}
-                            </label>
+            <div class="card-body">
+                <form method="POST" id="dogForm" data-validation='{"validateOnInput": true, "validateOnBlur": true, "showCharacterCounters": true, "showRealTimeFeedback": true}'>
+                    {{ form.hidden_tag() }}
+                    
+                    <div class="row">
+                        <div class="col-md-6">
+                            <div class="mb-3">
+                                {{ form.name.label(class="form-label") }}
+                                {{ form.name(class="form-control", placeholder="Enter dog name (e.g., Max)", maxlength="100") }}
+                                {% if form.name.errors %}
+                                    <div class="text-danger">
+                                        {% for error in form.name.errors %}
+                                            <small>{{ error }}</small>
+                                        {% endfor %}
+                                    </div>
+                                {% endif %}
+                            </div>
                         </div>
-                        {% endfor %}
+                        <div class="col-md-6">
+                            <div class="mb-3">
+                                {{ form.approx_age.label(class="form-label") }}
+                                {{ form.approx_age(class="form-control", placeholder="Enter approximate age (e.g., 3 years, 6 months)", maxlength="50") }}
+                                {% if form.approx_age.errors %}
+                                    <div class="text-danger">
+                                        {% for error in form.approx_age.errors %}
+                                            <small>{{ error }}</small>
+                                        {% endfor %}
+                                    </div>
+                                {% endif %}
+                            </div>
+                        </div>
                     </div>
-                    {{ form.badges(class="form-control", style="display: none;") }}
-                </div>
-            </div>
-            
-            <div class="row mb-3">
-                <div class="col-sm-10 offset-sm-2">
-                    <div class="d-grid gap-2 d-md-block">
+                    
+                    <div class="row">
+                        <div class="col-md-6">
+                            <div class="mb-3">
+                                {{ form.size.label(class="form-label") }}
+                                {{ form.size(class="form-control") }}
+                                {% if form.size.errors %}
+                                    <div class="text-danger">
+                                        {% for error in form.size.errors %}
+                                            <small>{{ error }}</small>
+                                        {% endfor %}
+                                    </div>
+                                {% endif %}
+                            </div>
+                        </div>
+                        <div class="col-md-6">
+                            <div class="mb-3">
+                                {{ form.breed_type.label(class="form-label") }}
+                                {{ form.breed_type(class="form-control", placeholder="Enter breed or type (e.g., Golden Retriever, Mixed)", maxlength="100") }}
+                                {% if form.breed_type.errors %}
+                                    <div class="text-danger">
+                                        {% for error in form.breed_type.errors %}
+                                            <small>{{ error }}</small>
+                                        {% endfor %}
+                                    </div>
+                                {% endif %}
+                            </div>
+                        </div>
+                    </div>
+                    
+                    <div class="d-grid gap-2 d-md-flex justify-content-md-end">
+                        <a href="{{ url_for('home') }}" class="btn btn-secondary me-md-2">
+                            <i class="fa fa-times me-2"></i>Cancel
+                        </a>
                         <button type="submit" class="btn btn-primary" id="submitBtn">
                             <span class="btn-text">
-                                {% if employee %}Update{% else %}Add{% endif %} Employee
+                                {% if dog %}Update{% else %}Add{% endif %} Dog
                             </span>
                         </button>
-                        <a href="{{ url_for('home') }}" class="btn btn-secondary">Cancel</a>
                         <button type="button" class="btn btn-outline-info" onclick="resetFormValidation()">
                             <i class="fa fa-refresh"></i> Reset Validation
                         </button>
                     </div>
-                </div>
+                </form>
             </div>
-        </form>
+        </div>
     </div>
 </div>
 
@@ -91,7 +101,7 @@ let formValidator;
 
 document.addEventListener('DOMContentLoaded', function() {
     // Initialize the form validator
-    formValidator = new FormValidator('employeeForm', {
+    formValidator = new FormValidator('dogForm', {
         validateOnInput: true,
         validateOnBlur: true,
         showCharacterCounters: true,
@@ -100,7 +110,7 @@ document.addEventListener('DOMContentLoaded', function() {
     });
     
     // Enhanced form submission with loading states
-    const form = document.getElementById('employeeForm');
+    const form = document.getElementById('dogForm');
     const submitBtn = document.getElementById('submitBtn');
     
     if (form && submitBtn) {
@@ -128,42 +138,20 @@ document.addEventListener('DOMContentLoaded', function() {
         });
     }
     
-    // Add loading state to badge checkboxes
-    const badgeCheckboxes = document.querySelectorAll('input[type="checkbox"]');
-    badgeCheckboxes.forEach(checkbox => {
-        checkbox.addEventListener('change', function() {
-            const label = this.nextElementSibling;
-            if (label) {
-                label.style.opacity = '0.7';
+    // Add loading state to form fields
+    const formFields = document.querySelectorAll('.form-control');
+    formFields.forEach(field => {
+        field.addEventListener('change', function() {
+            const fieldContainer = this.parentNode;
+            if (fieldContainer) {
+                fieldContainer.style.opacity = '0.7';
                 setTimeout(() => {
-                    label.style.opacity = '1';
+                    fieldContainer.style.opacity = '1';
                 }, 300);
             }
         });
     });
 });
-
-function updateBadges() {
-    // Show loading state for badge update
-    const badgesContainer = document.getElementById('badgesContainer');
-    badgesContainer.classList.add('badge-loading');
-    
-    setTimeout(() => {
-        const checkboxes = document.querySelectorAll('input[type="checkbox"]');
-        const selectedBadges = [];
-        
-        checkboxes.forEach(checkbox => {
-            if (checkbox.checked) {
-                selectedBadges.push(checkbox.value);
-            }
-        });
-        
-        document.getElementById('badges').value = selectedBadges.join(',');
-        
-        // Hide loading state
-        badgesContainer.classList.remove('badge-loading');
-    }, 100);
-}
 
 function resetFormValidation() {
     if (formValidator) {
@@ -171,15 +159,8 @@ function resetFormValidation() {
     }
     
     // Clear form fields
-    const form = document.getElementById('employeeForm');
+    const form = document.getElementById('dogForm');
     form.reset();
-    
-    // Reset badge selection
-    const checkboxes = document.querySelectorAll('input[type="checkbox"]');
-    checkboxes.forEach(checkbox => {
-        checkbox.checked = false;
-    });
-    document.getElementById('badges').value = '';
     
     // Show success message
     showMessage('Form has been reset successfully!', 'success');
@@ -195,7 +176,7 @@ function showMessage(message, type = 'info') {
     `;
     
     // Insert at the top of the form
-    const form = document.getElementById('employeeForm');
+    const form = document.getElementById('dogForm');
     form.insertBefore(messageDiv, form.firstChild);
     
     // Auto-remove after 5 seconds

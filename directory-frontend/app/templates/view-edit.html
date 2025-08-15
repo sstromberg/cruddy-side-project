@@ -1,100 +1,354 @@
 {% extends "main.html" %}
-{% block headtitle %}{{ title }}{% endblock %}
+{% block headtitle %}{{ dog.name }} - Dog Details{% endblock %}
 {% block headnav %}
-    <a class="btn btn-outline-primary" href="{{ url_for('edit', employee_id=employee.id) }}">Edit</a>
-    <a class="btn btn-outline-primary" href="{{ url_for('home') }}">Home</a>
+    <a class="btn btn-outline-secondary" href="{{ url_for('home') }}">
+        <i class="fa fa-arrow-left me-2"></i>Back to Dogs
+    </a>
+    {% if current_user.is_authenticated and current_user.role in ['admin', 'manager'] %}
+        <a class="btn btn-outline-info" href="{{ url_for('add_event') }}">
+            <i class="fa fa-calendar-plus me-2"></i>Add Event
+        </a>
+    {% endif %}
 {% endblock %}
 {% block body %}
-
 <div class="row">
-  <div class="col-md-12">
-    <div class="row mb-3">
-      <label class="col-sm-2 col-form-label">Full Name</label>
-      <div class="col-sm-10">
-        {{ employee.fullname }}
-      </div>
-    </div>
-    <div class="row mb-3">
-      <label class="col-sm-2 col-form-label">Location</label>
-      <div class="col-sm-10">
-        {{ employee.location }}
-      </div>
-    </div>
-    <div class="row mb-3">
-      <label class="col-sm-2 col-form-label">Job Title</label>
-      <div class="col-sm-10">
-        {{ employee.job_title }}
-      </div>
-    </div>
-    <div class="row mb-3">
-      <label class="col-sm-2 col-form-label">Badges</label>
-      <div class="col-sm-10">
-        <div id="badgesDisplay">
-          {% for badge_key, badge_name in badges.items() %}
-            {% if badge_key in employee.badges %}
-              <span class="badge bg-primary me-2">
-                <i class="fa fa-{{ badge_key }}"></i> {{ badge_name }}
-              </span>
-            {% endif %}
-          {% endfor %}
+    <div class="col-md-12">
+        <!-- Dog Information Card -->
+        <div class="card shadow mb-4">
+            <div class="card-header">
+                <div class="d-flex justify-content-between align-items-center">
+                    <h3 class="mb-0">
+                        <i class="fa fa-paw me-2"></i>{{ dog.name }}
+                    </h3>
+                    <div>
+                        {% if current_user.is_authenticated and current_user.role in ['admin', 'manager'] %}
+                            <a href="{{ url_for('edit', dog_id=dog.id) }}" class="btn btn-outline-warning me-2">
+                                <i class="fa fa-edit me-1"></i>Edit Dog
+                            </a>
+                        {% endif %}
+                        {% if current_user.is_authenticated and current_user.role == 'admin' %}
+                            <form method="POST" action="{{ url_for('delete', dog_id=dog.id) }}" class="d-inline" 
+                                  id="deleteDogForm"
+                                  onsubmit="return confirmDeleteDog(event)">
+                                <button type="submit" class="btn btn-outline-danger" id="deleteDogBtn">
+                                    <span class="btn-text">
+                                        <i class="fa fa-trash me-1"></i>Delete
+                                    </span>
+                                </button>
+                            </form>
+                        {% endif %}
+                    </div>
+                </div>
+            </div>
+            <div class="card-body">
+                <div class="row">
+                    <div class="col-md-3">
+                        <div class="text-center mb-3">
+                            <i class="fa fa-paw fa-3x text-primary"></i>
+                        </div>
+                        <h5 class="text-center">{{ dog.name }}</h5>
+                    </div>
+                    <div class="col-md-9">
+                        <div class="row">
+                            <div class="col-md-6">
+                                <p><strong><i class="fa fa-calendar me-2"></i>Age:</strong> {{ dog.approx_age }}</p>
+                                <p><strong><i class="fa fa-ruler me-2"></i>Size:</strong> 
+                                    <span class="badge bg-secondary">{{ dog_sizes[dog.size] }}</span>
+                                </p>
+                            </div>
+                            <div class="col-md-6">
+                                <p><strong><i class="fa fa-dna me-2"></i>Breed/Type:</strong> {{ dog.breed_type }}</p>
+                                <p><strong><i class="fa fa-calendar-check me-2"></i>Events Recorded:</strong> {{ events|length }}</p>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
         </div>
-      </div>
-    </div>
-    
-    <div class="row mb-3">
-      <div class="col-sm-10 offset-sm-2">
-        <div class="d-grid gap-2 d-md-block">
-          <form method="POST" action="{{ url_for('delete', employee_id=employee.id) }}" 
-                style="display: inline;" 
-                id="deleteForm"
-                onsubmit="return confirmDelete(event)">
-            <button type="submit" class="btn btn-danger" id="deleteBtn">
-              <span class="btn-text">Delete Employee</span>
-            </button>
-          </form>
+
+        <!-- Events Table -->
+        <div class="card shadow">
+            <div class="card-header">
+                <div class="d-flex justify-content-between align-items-center">
+                    <h4 class="mb-0">
+                        <i class="fa fa-calendar me-2"></i>Recent Events
+                    </h4>
+                    {% if current_user.is_authenticated and current_user.role in ['admin', 'manager'] %}
+                        <a href="{{ url_for('add_event') }}" class="btn btn-success">
+                            <i class="fa fa-plus me-2"></i>Add Event
+                        </a>
+                    {% endif %}
+                </div>
+            </div>
+            <div class="card-body">
+                {% if events %}
+                    <div class="table-responsive">
+                        <table class="table table-striped table-hover">
+                            <thead class="table-dark">
+                                <tr>
+                                    <th>Type</th>
+                                    <th>Start Time</th>
+                                    <th>End Time</th>
+                                    <th>Duration</th>
+                                    <th>Location</th>
+                                    <th>Notes</th>
+                                    <th>Bristol Scale</th>
+                                    <th>Actions</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                {% for event in events %}
+                                <tr>
+                                    <td>
+                                        <span class="badge bg-primary">
+                                            <i class="fa fa-{% if event.event_type == 'walk' %}walking{% elif event.event_type == 'poop' %}poop{% elif event.event_type == 'pee' %}tint{% elif event.event_type == 'vomit' %}exclamation-triangle{% else %}bed{% endif %} me-1"></i>
+                                            {{ event_types[event.event_type] }}
+                                        </span>
+                                    </td>
+                                    <td>
+                                        {% if event.timestamp %}
+                                            {{ event.timestamp.split('T')[0] }}<br>
+                                            <small class="text-muted">{{ event.timestamp.split('T')[1][:5] }}</small>
+                                        {% else %}
+                                            -
+                                        {% endif %}
+                                    </td>
+                                    <td>
+                                        {% if event.end_timestamp %}
+                                            {{ event.end_timestamp.split('T')[0] }}<br>
+                                            <small class="text-muted">{{ event.end_timestamp.split('T')[1][:5] }}</small>
+                                        {% else %}
+                                            -
+                                        {% endif %}
+                                    </td>
+                                    <td>
+                                        {% if event.duration %}
+                                            {{ "%.1f"|format(event.duration) }} min
+                                        {% else %}
+                                            -
+                                        {% endif %}
+                                    </td>
+                                    <td>
+                                        {% if event.location %}
+                                            <i class="fa fa-map-marker me-1"></i>{{ event.location }}
+                                        {% else %}
+                                            -
+                                        {% endif %}
+                                    </td>
+                                    <td>
+                                        {% if event.notes %}
+                                            <span class="text-truncate d-inline-block" style="max-width: 150px;" title="{{ event.notes }}">
+                                                {{ event.notes }}
+                                            </span>
+                                        {% else %}
+                                            -
+                                        {% endif %}
+                                    </td>
+                                    <td>
+                                        {% if event.bristol_stool_scale %}
+                                            <span class="badge bg-info">{{ event.bristol_stool_scale }}</span>
+                                        {% else %}
+                                            -
+                                        {% endif %}
+                                    </td>
+                                    <td>
+                                        <div class="btn-group btn-group-sm" role="group">
+                                            {% if current_user.is_authenticated and current_user.role in ['admin', 'manager'] %}
+                                                <a href="{{ url_for('edit_event', event_id=event.id) }}" class="btn btn-outline-warning btn-sm" title="Edit Event">
+                                                    <i class="fa fa-edit"></i>
+                                                </a>
+                                            {% endif %}
+                                            {% if current_user.is_authenticated and current_user.role == 'admin' %}
+                                                <form method="POST" action="{{ url_for('delete_event', event_id=event.id) }}" class="d-inline" 
+                                                      id="deleteEventForm_{{ event.id }}"
+                                                      onsubmit="return confirmDeleteEvent(event, '{{ event.id }}')">
+                                                    <button type="submit" class="btn btn-outline-danger btn-sm" title="Delete Event" id="deleteEventBtn_{{ event.id }}">
+                                                        <span class="btn-text">
+                                                            <i class="fa fa-trash"></i>
+                                                        </span>
+                                                    </button>
+                                                </form>
+                                            {% endif %}
+                                        </div>
+                                    </td>
+                                </tr>
+                                {% endfor %}
+                            </tbody>
+                        </table>
+                    </div>
+                {% else %}
+                    <div class="text-center py-5">
+                        <i class="fa fa-calendar fa-3x text-muted mb-3"></i>
+                        <h5 class="text-muted">No events recorded yet</h5>
+                        <p class="text-muted">Start tracking {{ dog.name }}'s activities by adding the first event.</p>
+                        {% if current_user.is_authenticated and current_user.role in ['admin', 'manager'] %}
+                            <a href="{{ url_for('add_event') }}" class="btn btn-primary">
+                                <i class="fa fa-plus me-2"></i>Add First Event
+                            </a>
+                        {% endif %}
+                    </div>
+                {% endif %}
+            </div>
         </div>
-      </div>
     </div>
-  </div>
+</div>
+
+<!-- Custom Confirmation Modal for Dog Deletion -->
+<div class="modal fade" id="deleteDogModal" tabindex="-1" aria-labelledby="deleteDogModalLabel" aria-hidden="true">
+    <div class="modal-dialog">
+        <div class="modal-content">
+            <div class="modal-header bg-danger text-white">
+                <h5 class="modal-title" id="deleteDogModalLabel">
+                    <i class="fa fa-exclamation-triangle me-2"></i>Confirm Dog Deletion
+                </h5>
+                <button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal" aria-label="Close"></button>
+            </div>
+            <div class="modal-body">
+                <p><strong>Are you sure you want to delete "{{ dog.name }}"?</strong></p>
+                <p class="text-danger">
+                    <i class="fa fa-warning me-2"></i>
+                    <strong>Warning:</strong> This action will permanently delete the dog and ALL associated events. This cannot be undone.
+                </p>
+                <p><strong>Events to be deleted:</strong> {{ events|length }}</p>
+            </div>
+            <div class="modal-footer">
+                <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">
+                    <i class="fa fa-times me-2"></i>Cancel
+                </button>
+                <button type="button" class="btn btn-danger" id="confirmDeleteDogBtn">
+                    <i class="fa fa-trash me-2"></i>Delete Dog
+                </button>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- Custom Confirmation Modal for Event Deletion -->
+<div class="modal fade" id="deleteEventModal" tabindex="-1" aria-labelledby="deleteEventModalLabel" aria-hidden="true">
+    <div class="modal-dialog">
+        <div class="modal-content">
+            <div class="modal-header bg-warning text-dark">
+                <h5 class="modal-title" id="deleteEventModalLabel">
+                    <i class="fa fa-exclamation-triangle me-2"></i>Confirm Event Deletion
+                </h5>
+                <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+            </div>
+            <div class="modal-body">
+                <p><strong>Are you sure you want to delete this event?</strong></p>
+                <p class="text-warning">
+                    <i class="fa fa-info-circle me-2"></i>
+                    This action will permanently delete the event. This cannot be undone.
+                </p>
+            </div>
+            <div class="modal-footer">
+                <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">
+                    <i class="fa fa-times me-2"></i>Cancel
+                </button>
+                <button type="button" class="btn btn-warning" id="confirmDeleteEventBtn">
+                    <i class="fa fa-trash me-2"></i>Delete Event
+                </button>
+            </div>
+        </div>
+    </div>
 </div>
 
 <script>
-function confirmDelete(event) {
-  const confirmed = confirm('Are you sure you want to delete this employee?');
-  if (confirmed) {
-    const deleteBtn = document.getElementById('deleteBtn');
-    const deleteForm = document.getElementById('deleteForm');
+// Enhanced deletion confirmation system
+let currentEventId = null;
+let deleteDogModal = null;
+let deleteEventModal = null;
+
+document.addEventListener('DOMContentLoaded', function() {
+    // Initialize Bootstrap modals
+    deleteDogModal = new bootstrap.Modal(document.getElementById('deleteDogModal'));
+    deleteEventModal = new bootstrap.Modal(document.getElementById('deleteEventModal'));
+    
+    // Set up dog deletion confirmation
+    document.getElementById('confirmDeleteDogBtn').addEventListener('click', function() {
+        confirmDeleteDogAction();
+    });
+    
+    // Set up event deletion confirmation
+    document.getElementById('confirmDeleteEventBtn').addEventListener('click', function() {
+        confirmDeleteEventAction();
+    });
+});
+
+function confirmDeleteDog(event) {
+    event.preventDefault();
+    
+    // Show custom confirmation modal
+    deleteDogModal.show();
+    
+    return false;
+}
+
+function confirmDeleteEvent(event, eventId) {
+    event.preventDefault();
+    
+    // Store the event ID for confirmation
+    currentEventId = eventId;
+    
+    // Show custom confirmation modal
+    deleteEventModal.show();
+    
+    return false;
+}
+
+function confirmDeleteDogAction() {
+    const deleteBtn = document.getElementById('deleteDogBtn');
+    const deleteForm = document.getElementById('deleteDogForm');
     
     // Show loading states
     LoadingManager.showButtonLoading(deleteBtn);
     LoadingManager.showFormLoading(deleteForm);
     
+    // Hide modal
+    deleteDogModal.hide();
+    
     // Add a small delay to show loading state
     setTimeout(() => {
-      // Form will submit naturally
+        // Submit the form
+        deleteForm.submit();
     }, 200);
+}
+
+function confirmDeleteEventAction() {
+    if (!currentEventId) return;
     
-    return true;
-  }
-  return false;
+    const deleteBtn = document.getElementById(`deleteEventBtn_${currentEventId}`);
+    const deleteForm = document.getElementById(`deleteEventForm_${currentEventId}`);
+    
+    // Show loading states
+    LoadingManager.showButtonLoading(deleteBtn);
+    LoadingManager.showFormLoading(deleteForm);
+    
+    // Hide modal
+    deleteEventModal.hide();
+    
+    // Add a small delay to show loading state
+    setTimeout(() => {
+        // Submit the form
+        deleteForm.submit();
+    }, 200);
 }
 
 // Enhanced badge display with loading animation
 document.addEventListener('DOMContentLoaded', function() {
-  const badgesDisplay = document.getElementById('badgesDisplay');
-  if (badgesDisplay) {
-    const badges = badgesDisplay.querySelectorAll('.badge');
-    badges.forEach((badge, index) => {
-      badge.style.opacity = '0';
-      badge.style.transform = 'translateY(10px)';
-      badge.style.transition = 'all 0.3s ease';
-      
-      setTimeout(() => {
-        badge.style.opacity = '1';
-        badge.style.transform = 'translateY(0)';
-      }, index * 100);
+    const eventRows = document.querySelectorAll('tbody tr');
+    eventRows.forEach((row, index) => {
+        const eventTypeCell = row.querySelector('td:first-child .badge');
+        if (eventTypeCell) {
+            eventTypeCell.style.opacity = '0';
+            eventTypeCell.style.transform = 'translateY(10px)';
+            eventTypeCell.style.transition = 'all 0.3s ease';
+            
+            setTimeout(() => {
+                eventTypeCell.style.opacity = '1';
+                eventTypeCell.style.transform = 'translateY(0)';
+            }, index * 100);
+        }
     });
-  }
 });
 </script>
 {% endblock %}

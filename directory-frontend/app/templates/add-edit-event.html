@@ -1,0 +1,158 @@
+{% extends "main.html" %}
+{% block headtitle %}{{ title }}{% endblock %}
+{% block headnav %}
+    <a class="btn btn-outline-secondary" href="{{ url_for('home') }}">
+        <i class="fa fa-arrow-left me-2"></i>Back to Dogs
+    </a>
+{% endblock %}
+{% block body %}
+<div class="row">
+    <div class="col-md-8 mx-auto">
+        <div class="card shadow">
+            <div class="card-header">
+                <h3 class="mb-0">
+                    <i class="fa fa-calendar-plus me-2"></i>{{ title }}
+                </h3>
+            </div>
+            <div class="card-body">
+                <form method="POST" id="eventForm">
+                    {{ form.hidden_tag() }}
+                    
+                    <div class="row">
+                        <div class="col-md-6">
+                            <div class="mb-3">
+                                {{ form.dog_id.label(class="form-label") }}
+                                {{ form.dog_id(class="form-control") }}
+                                {% if form.dog_id.errors %}
+                                    <div class="text-danger">
+                                        {% for error in form.dog_id.errors %}
+                                            <small>{{ error }}</small>
+                                        {% endfor %}
+                                    </div>
+                                {% endif %}
+                            </div>
+                        </div>
+                        <div class="col-md-6">
+                            <div class="mb-3">
+                                {{ form.event_type.label(class="form-label") }}
+                                {{ form.event_type(class="form-control") }}
+                                {% if form.event_type.errors %}
+                                    <div class="text-danger">
+                                        {% for error in form.event_type.errors %}
+                                            <small>{{ error }}</small>
+                                        {% endfor %}
+                                    </div>
+                                {% endif %}
+                            </div>
+                        </div>
+                    </div>
+                    
+                    <div class="row">
+                        <div class="col-md-6">
+                            <div class="mb-3">
+                                {{ form.timestamp.label(class="form-label") }}
+                                {{ form.timestamp(class="form-control") }}
+                                {% if form.timestamp.errors %}
+                                    <div class="text-danger">
+                                        {% for error in form.timestamp.errors %}
+                                            <small>{{ error }}</small>
+                                        {% endfor %}
+                                    </div>
+                                {% endif %}
+                            </div>
+                        </div>
+                        <div class="col-md-6">
+                            <div class="mb-3">
+                                {{ form.end_timestamp.label(class="form-label") }}
+                                {{ form.end_timestamp(class="form-control") }}
+                                {% if form.end_timestamp.errors %}
+                                    <div class="text-danger">
+                                        {% for error in form.end_timestamp.errors %}
+                                            <small>{{ error }}</small>
+                                        {% endfor %}
+                                    </div>
+                                {% endif %}
+                                <small class="form-text text-muted">Leave empty for instant events like poop, pee, vomit</small>
+                            </div>
+                        </div>
+                    </div>
+                    
+                    <div class="row">
+                        <div class="col-md-6">
+                            <div class="mb-3">
+                                {{ form.location.label(class="form-label") }}
+                                {{ form.location(class="form-control") }}
+                                {% if form.location.errors %}
+                                    <div class="text-danger">
+                                        {% for error in form.location.errors %}
+                                            <small>{{ error }}</small>
+                                        {% endfor %}
+                                    </div>
+                                {% endif %}
+                            </div>
+                        </div>
+                        <div class="col-md-6">
+                            <div class="mb-3" id="bristolStoolScaleField" style="display: none;">
+                                {{ form.bristol_stool_scale.label(class="form-label") }}
+                                {{ form.bristol_stool_scale(class="form-control") }}
+                                {% if form.bristol_stool_scale.errors %}
+                                    <div class="text-danger">
+                                        {% for error in form.bristol_stool_scale.errors %}
+                                            <small>{{ error }}</small>
+                                        {% endfor %}
+                                    </div>
+                                {% endif %}
+                                <small class="form-text text-muted">Only applicable for poop events</small>
+                            </div>
+                        </div>
+                    </div>
+                    
+                    <div class="mb-3">
+                        {{ form.notes.label(class="form-label") }}
+                        {{ form.notes(class="form-control", rows="3") }}
+                        {% if form.notes.errors %}
+                            <div class="text-danger">
+                                {% for error in form.notes.errors %}
+                                    <small>{{ error }}</small>
+                                {% endfor %}
+                            </div>
+                        {% endif %}
+                    </div>
+                    
+                    <div class="d-grid gap-2 d-md-flex justify-content-md-end">
+                        <a href="{{ url_for('home') }}" class="btn btn-secondary me-md-2">
+                            <i class="fa fa-times me-2"></i>Cancel
+                        </a>
+                        <button type="submit" class="btn btn-primary">
+                            <i class="fa fa-save me-2"></i>Save Event
+                        </button>
+                    </div>
+                </form>
+            </div>
+        </div>
+    </div>
+</div>
+
+<script>
+document.addEventListener('DOMContentLoaded', function() {
+    const eventTypeSelect = document.getElementById('event_type');
+    const bristolField = document.getElementById('bristolStoolScaleField');
+    
+    function toggleBristolField() {
+        if (eventTypeSelect.value === 'poop') {
+            bristolField.style.display = 'block';
+        } else {
+            bristolField.style.display = 'none';
+            // Clear the value when hiding
+            document.getElementById('bristol_stool_scale').value = '';
+        }
+    }
+    
+    // Initial state
+    toggleBristolField();
+    
+    // Listen for changes
+    eventTypeSelect.addEventListener('change', toggleBristolField);
+});
+</script>
+{% endblock %}
