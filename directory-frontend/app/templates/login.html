@@ -1,0 +1,105 @@
+{% extends "main.html" %}
+{% block headtitle %}Login - Employee Directory{% endblock %}
+{% block headnav %}
+    <a class="btn btn-outline-primary" href="{{ url_for('home') }}">Home</a>
+{% endblock %}
+{% block body %}
+<div class="row justify-content-center">
+    <div class="col-md-6 col-lg-4">
+        <div class="card shadow-sm">
+            <div class="card-header bg-primary text-white text-center">
+                <h4 class="mb-0">
+                    <i class="fa fa-sign-in-alt me-2"></i>Login
+                </h4>
+            </div>
+            <div class="card-body p-4">
+                <form method="POST" id="loginForm">
+                    {{ form.hidden_tag() }}
+                    
+                    <div class="mb-3">
+                        <label for="{{ form.username.id }}" class="form-label">
+                            <i class="fa fa-user me-2"></i>{{ form.username.label }}
+                        </label>
+                        {{ form.username(class="form-control", placeholder="Enter your username") }}
+                        {% if form.username.errors %}
+                            {% for error in form.username.errors %}
+                                <div class="text-danger small mt-1">
+                                    <i class="fa fa-exclamation-circle me-1"></i>{{ error }}
+                                </div>
+                            {% endfor %}
+                        {% endif %}
+                    </div>
+                    
+                    <div class="mb-3">
+                        <label for="{{ form.password.id }}" class="form-label">
+                            <i class="fa fa-lock me-2"></i>{{ form.password.label }}
+                        </label>
+                        {{ form.password(class="form-control", placeholder="Enter your password") }}
+                        {% if form.password.errors %}
+                            {% for error in form.password.errors %}
+                                <div class="text-danger small mt-1">
+                                    <i class="fa fa-exclamation-circle me-1"></i>{{ error }}
+                                </div>
+                            {% endfor %}
+                        {% endif %}
+                    </div>
+                    
+                    <div class="d-grid">
+                        <button type="submit" class="btn btn-primary btn-lg">
+                            <i class="fa fa-sign-in-alt me-2"></i>Sign In
+                        </button>
+                    </div>
+                </form>
+                
+                <hr class="my-4">
+                
+                <div class="text-center">
+                    <h6 class="text-muted mb-3">Sample Accounts</h6>
+                    <div class="row">
+                        <div class="col-6">
+                            <div class="card border-info">
+                                <div class="card-body p-2">
+                                    <small class="text-info">
+                                        <strong>Admin</strong><br>
+                                        <code>admin</code> / <code>Admin123!</code>
+                                    </small>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="col-6">
+                            <div class="card border-success">
+                                <div class="card-body p-2">
+                                    <small class="text-success">
+                                        <strong>Employee</strong><br>
+                                        <code>employee</code> / <code>Employee123!</code>
+                                    </small>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+        
+        <div class="text-center mt-3">
+            <small class="text-muted">
+                <i class="fa fa-shield-alt me-1"></i>
+                Secure authentication powered by Flask-Login
+            </small>
+        </div>
+    </div>
+</div>
+
+<script>
+document.addEventListener('DOMContentLoaded', function() {
+    const form = document.getElementById('loginForm');
+    const submitBtn = form.querySelector('button[type="submit"]');
+    
+    form.addEventListener('submit', function() {
+        // Show loading state
+        submitBtn.disabled = true;
+        submitBtn.innerHTML = '<i class="fa fa-spinner fa-spin me-2"></i>Signing In...';
+    });
+});
+</script>
+{% endblock %}

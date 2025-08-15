@@ -33,8 +33,33 @@
       <nav class="my-2 my-md-0 me-md-3">
         {% block headnav %}
         {% endblock %}
+        
+        <!-- User Authentication Section -->
+        {% if current_user.is_authenticated %}
+          <div class="dropdown d-inline-block">
+            <button class="btn btn-outline-info dropdown-toggle" type="button" id="userDropdown" data-bs-toggle="dropdown" aria-expanded="false">
+              <i class="fa fa-user me-2"></i>{{ current_user.full_name }}
+            </button>
+            <ul class="dropdown-menu" aria-labelledby="userDropdown">
+              <li><h6 class="dropdown-header">{{ current_user.role|title }}</h6></li>
+              <li><hr class="dropdown-divider"></li>
+              {% if current_user.role == 'admin' %}
+                <li><a class="dropdown-item" href="{{ url_for('register') }}">
+                  <i class="fa fa-user-plus me-2"></i>Register User
+                </a></li>
+                <li><hr class="dropdown-divider"></li>
+              {% endif %}
+              <li><a class="dropdown-item" href="{{ url_for('logout') }}">
+                <i class="fa fa-sign-out-alt me-2"></i>Logout
+              </a></li>
+            </ul>
+          </div>
+        {% else %}
+          <a class="btn btn-outline-primary" href="{{ url_for('login') }}">
+            <i class="fa fa-sign-in-alt me-2"></i>Login
+          </a>
+        {% endif %}
       </nav>
-      
     </div>
     
 

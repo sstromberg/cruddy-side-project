@@ -4,10 +4,19 @@ Optimized for AWS Lambda deployment
 """
 from flask import Flask
 from flask_sqlalchemy import SQLAlchemy
+from flask_limiter import Limiter
+from flask_limiter.util import get_remote_address
 import os
 
 # Initialize SQLAlchemy
 db = SQLAlchemy()
+
+# Initialize rate limiter
+limiter = Limiter(
+    key_func=get_remote_address,
+    default_limits=["200 per day", "50 per hour"],
+    storage_uri="memory://"
+)
 
 def create_app():
     """Application factory pattern"""
@@ -30,6 +39,7 @@ def create_app():
     
     # Initialize extensions
     db.init_app(app)
+    limiter.init_app(app)
     
     # Register blueprints
     from .routes import main_bp

@@ -4,6 +4,7 @@ Optimized for AWS Lambda deployment
 """
 from flask import Blueprint, render_template, request, redirect, url_for, flash, jsonify
 from .models import get_employees, get_employee, create_employee, update_employee, delete_employee
+from . import limiter
 import json
 
 main_bp = Blueprint('main', __name__)
@@ -35,6 +36,7 @@ def home():
         return render_template('main.html', employees=[], badges=BADGES)
 
 @main_bp.route('/add', methods=['GET', 'POST'])
+@limiter.limit("10 per minute")
 def add():
     """Add new employee"""
     if request.method == 'POST':
@@ -82,6 +84,7 @@ def view(employee_id):
         return redirect(url_for('main.home'))
 
 @main_bp.route('/edit/<employee_id>', methods=['GET', 'POST'])
+@limiter.limit("10 per minute")
 def edit(employee_id):
     """Edit existing employee"""
     try:
@@ -122,6 +125,7 @@ def edit(employee_id):
         return redirect(url_for('main.home'))
 
 @main_bp.route('/delete/<employee_id>', methods=['POST'])
+@limiter.limit("5 per minute")
 def delete(employee_id):
     """Delete employee"""
     try:
@@ -137,6 +141,7 @@ def delete(employee_id):
 
 # API endpoints for future use
 @main_bp.route('/api/employees')
+@limiter.limit("100 per hour")
 def api_employees():
     """API endpoint to get all employees"""
     try:
@@ -153,6 +158,7 @@ def api_employees():
         }), 500
 
 @main_bp.route('/api/employees/<employee_id>')
+@limiter.limit("100 per hour")
 def api_employee(employee_id):
     """API endpoint to get specific employee"""
     try:

@@ -31,7 +31,7 @@ def main():
         app.run(
             host='127.0.0.1',
             port=8080,
-            debug=True,
+            debug=False,  # Production setting - no debug mode
             use_reloader=False  # Disable reloader to avoid issues
         )
         

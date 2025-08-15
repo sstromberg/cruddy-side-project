@@ -1,0 +1,160 @@
+{% extends "main.html" %}
+{% block headtitle %}Register User - Employee Directory{% endblock %}
+{% block headnav %}
+    <a class="btn btn-outline-primary" href="{{ url_for('home') }}">Home</a>
+    <a class="btn btn-outline-secondary" href="{{ url_for('logout') }}">Logout</a>
+{% endblock %}
+{% block body %}
+<div class="row justify-content-center">
+    <div class="col-md-8 col-lg-6">
+        <div class="card shadow-sm">
+            <div class="card-header bg-success text-white text-center">
+                <h4 class="mb-0">
+                    <i class="fa fa-user-plus me-2"></i>Register New User
+                </h4>
+            </div>
+            <div class="card-body p-4">
+                <form method="POST" id="userForm">
+                    {{ form.hidden_tag() }}
+                    
+                    <div class="row">
+                        <div class="col-md-6 mb-3">
+                            <label for="{{ form.username.id }}" class="form-label">
+                                <i class="fa fa-user me-2"></i>{{ form.username.label }}
+                            </label>
+                            {{ form.username(class="form-control") }}
+                            {% if form.username.errors %}
+                                {% for error in form.username.errors %}
+                                    <div class="text-danger small mt-1">
+                                        <i class="fa fa-exclamation-circle me-1"></i>{{ error }}
+                                    </div>
+                                {% endfor %}
+                            {% endif %}
+                        </div>
+                        
+                        <div class="col-md-6 mb-3">
+                            <label for="{{ form.email.id }}" class="form-label">
+                                <i class="fa fa-envelope me-2"></i>{{ form.email.label }}
+                            </label>
+                            {{ form.email(class="form-control") }}
+                            {% if form.email.errors %}
+                                {% for error in form.email.errors %}
+                                    <div class="text-danger small mt-1">
+                                        <i class="fa fa-exclamation-circle me-1"></i>{{ error }}
+                                    </div>
+                                {% endfor %}
+                            {% endif %}
+                        </div>
+                    </div>
+                    
+                    <div class="mb-3">
+                        <label for="{{ form.full_name.id }}" class="form-label">
+                            <i class="fa fa-id-card me-2"></i>{{ form.full_name.label }}
+                        </label>
+                        {{ form.full_name(class="form-control") }}
+                        {% if form.full_name.errors %}
+                            {% for error in form.full_name.errors %}
+                                <div class="text-danger small mt-1">
+                                    <i class="fa fa-exclamation-circle me-1"></i>{{ error }}
+                                </div>
+                            {% endfor %}
+                        {% endif %}
+                    </div>
+                    
+                    <div class="row">
+                        <div class="col-md-6 mb-3">
+                            <label for="{{ form.password.id }}" class="form-label">
+                                <i class="fa fa-lock me-2"></i>{{ form.password.label }}
+                            </label>
+                            {{ form.password(class="form-control") }}
+                            {% if form.password.errors %}
+                                {% for error in form.password.errors %}
+                                    <div class="text-danger small mt-1">
+                                        <i class="fa fa-exclamation-circle me-1"></i>{{ error }}
+                                    </div>
+                                {% endfor %}
+                            {% endif %}
+                            <div class="form-text">
+                                <small>
+                                    <i class="fa fa-info-circle me-1"></i>
+                                    Must be at least 8 characters with mixed case, numbers, and symbols
+                                </small>
+                            </div>
+                        </div>
+                        
+                        <div class="col-md-6 mb-3">
+                            <label for="{{ form.role.id }}" class="form-label">
+                                <i class="fa fa-user-tag me-2"></i>{{ form.role.label }}
+                            </label>
+                            {{ form.role(class="form-select") }}
+                            {% if form.role.errors %}
+                                {% for error in form.role.errors %}
+                                    <div class="text-danger small mt-1">
+                                        <i class="fa fa-exclamation-circle me-1"></i>{{ error }}
+                                    </div>
+                                {% endfor %}
+                            {% endif %}
+                        </div>
+                    </div>
+                    
+                    <div class="d-grid gap-2 d-md-block">
+                        <button type="submit" class="btn btn-success btn-lg">
+                            <i class="fa fa-user-plus me-2"></i>Create User
+                        </button>
+                        <a href="{{ url_for('home') }}" class="btn btn-secondary btn-lg">
+                            <i class="fa fa-times me-2"></i>Cancel
+                        </a>
+                    </div>
+                </form>
+            </div>
+        </div>
+        
+        <div class="card mt-3">
+            <div class="card-body">
+                <h6 class="card-title">
+                    <i class="fa fa-info-circle me-2"></i>Role Descriptions
+                </h6>
+                <div class="row">
+                    <div class="col-md-4">
+                        <div class="border-start border-primary ps-3">
+                            <strong class="text-primary">Admin</strong>
+                            <small class="d-block text-muted">
+                                Full access to all features including user management and employee deletion
+                            </small>
+                        </div>
+                    </div>
+                    <div class="col-md-4">
+                        <div class="border-start border-warning ps-3">
+                            <strong class="text-warning">Manager</strong>
+                            <small class="d-block text-muted">
+                                Can view, add, and edit employees but cannot delete or manage users
+                            </small>
+                        </div>
+                    </div>
+                    <div class="col-md-4">
+                        <div class="border-start border-success ps-3">
+                            <strong class="text-success">Employee</strong>
+                            <small class="d-block text-muted">
+                                Read-only access to employee directory
+                            </small>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<script>
+document.addEventListener('DOMContentLoaded', function() {
+    const form = document.getElementById('userForm');
+    const submitBtn = form.querySelector('button[type="submit"]');
+    
+    form.addEventListener('submit', function() {
+        // Show loading state
+        submitBtn.disabled = true;
+        submitBtn.innerHTML = '<i class="fa fa-spinner fa-spin me-2"></i>Creating User...';
+    });
+});
+</script>
+{% endblock %}
